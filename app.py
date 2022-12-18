@@ -37,13 +37,6 @@ def hello() -> str:
 
     return "Hello, World!"
 
-@app.route('/check_plagiarism', methods=['POST'])
-def check_plagiarism():
-    text1 = request.form['text1']
-    text2 = request.form['text2']
-    similarity = compute_similarity(text1, text2)
-    return str(similarity)
-
 def preprocess_text(text):
     # Remove punctuation and make all characters lowercase
     text = re.sub(r'[^\w\s]', '', text)
