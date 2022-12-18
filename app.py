@@ -16,7 +16,11 @@ import signal
 import sys
 from types import FrameType
 
-from flask import Flask
+from flask import Flask, request
+
+from collections import Counter
+import re
+from math import sqrt
 
 from utils.logging import logger
 
@@ -32,6 +36,50 @@ def hello() -> str:
     logger.info("Child logger with trace Id.")
 
     return "Hello, World!"
+
+@app.route('/check_plagiarism', methods=['POST'])
+def check_plagiarism():
+    text1 = request.form['text1']
+    text2 = request.form['text2']
+    similarity = compute_similarity(text1, text2)
+    return str(similarity)
+
+def preprocess_text(text):
+    # Remove punctuation and make all characters lowercase
+    text = re.sub(r'[^\w\s]', '', text)
+    text = text.lower()
+    return text
+
+def compute_similarity(text1, text2):
+    # Preprocess the texts
+    text1 = preprocess_text(text1)
+    text2 = preprocess_text(text2)
+
+    # Tokenize the texts
+    tokens1 = text1.split()
+    tokens2 = text2.split()
+
+    # Compute the frequency of each word in each text
+    frequency1 = Counter(tokens1)
+    frequency2 = Counter(tokens2)
+
+    # Compute the dot product of the frequency vectors
+    dot_product = sum(frequency1[token] *
+frequency2[token] for token in frequency1)
+
+    # Compute the Euclidean norms of the frequency vectors
+    norm1 = sqrt(sum(frequency1[token] ** 2 for token in frequency1))
+    norm2 = sqrt(sum(frequency2[token] ** 2 for token in frequency2))
+
+    # Return the cosine similarity
+    return dot_product / (norm1 * norm2)
+
+@app.route('/check_plagiarism', methods=['POST'])
+def check_plagiarism():
+    text1 = request.form['text1']
+    text2 = request.form['text2']
+    similarity = compute_similarity(text1, text2)
+    return str(similarity)
 
 
 def shutdown_handler(signal_int: int, frame: FrameType) -> None:
