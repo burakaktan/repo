@@ -67,7 +67,7 @@ frequency2[token] for token in frequency1)
     # Return the cosine similarity
     return dot_product / (norm1 * norm2)
 
-@app.route('/check_plagiarism', methods=['POST'])
+@app.route('/check_plagiarism', methods=['GET'])
 def check_plagiarism():
     text1 = ""
     text2 = ""
