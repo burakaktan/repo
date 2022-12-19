@@ -69,8 +69,13 @@ frequency2[token] for token in frequency1)
 
 @app.route('/check_plagiarism', methods=['POST'])
 def check_plagiarism():
-    text1 = request.form['text1']
-    text2 = request.form['text2']
+    text1 = ""
+    text2 = ""
+    try:
+        text1 = str(request.args.get('text1'))
+        text2 = str(request.args.get('text2'))
+    except Exception as e:
+        return e.message + + "text1= " + str(text1)
     similarity = compute_similarity(text1, text2)
     return str(similarity)
 
