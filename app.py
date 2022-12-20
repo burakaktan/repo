@@ -29,13 +29,42 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello() -> str:
-    # Use basic logging with custom fields
-    logger.info(logField="custom-entry", arbitraryField="custom-entry")
+    import time
+    start = time.time()
+    #request_json = request.get_json()
+    #text1 = request_json['text1']
+    #text2 = request_json['text2']
+    text1 = ""
+    text2 = ""
+    try:
+        text1 = str(request.args.get('text1'))
+        text2 = str(request.args.get('text2'))
+    except Exception as e:
+        return e.message + + "text1= " + str(text1)
+    
+    similarity = compute_similarity(text1, text2)
+    end = time.time()
+    time_result = end-start
 
-    # https://cloud.google.com/run/docs/logging#correlate-logs
-    logger.info("Child logger with trace Id.")
+        # Get the request parameters
+    string1 = request.args.get('text1')
+    string2 = request.args.get('text2')
+    
+    # Create a client for interacting with Google Cloud Storage
+    storage_client = storage.Client()
+    
+    # Get the bucket where the files will be stored
+    bucket = storage_client.bucket("storage_time_and_result")
+    
+    # Write string1 to a file called "file1.txt"
+    file1 = bucket.blob("function_time.txt")
+    file1.upload_from_string(str(time_result))
+    
+    # Write string2 to a file called "file2.txt"
+    file2 = bucket.blob("function_result.txt")
+    file2.upload_from_string(str(similarity))
 
-    return "Hello, World!"
+    return "function result:" + str(similarity) +  " with time: " + str(end-start)
 
 def preprocess_text(text):
     # Remove punctuation and make all characters lowercase
@@ -66,18 +95,6 @@ frequency2[token] for token in frequency1)
 
     # Return the cosine similarity
     return dot_product / (norm1 * norm2)
-
-@app.route('/check_plagiarism', methods=['GET'])
-def check_plagiarism():
-    text1 = ""
-    text2 = ""
-    try:
-        text1 = str(request.args.get('text1'))
-        text2 = str(request.args.get('text2'))
-    except Exception as e:
-        return e.message + + "text1= " + str(text1)
-    similarity = compute_similarity(text1, text2)
-    return str(similarity)
 
 
 def shutdown_handler(signal_int: int, frame: FrameType) -> None:
