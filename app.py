@@ -58,11 +58,11 @@ def hello() -> str:
     bucket = storage_client.bucket("storage_time_and_result")
     
     # Write string1 to a file called "file1.txt"
-    file1 = bucket.blob("function_time.txt")
+    file1 = bucket.blob("cloud_run_time.txt")
     file1.upload_from_string(str(time_result))
     
     # Write string2 to a file called "file2.txt"
-    file2 = bucket.blob("function_result.txt")
+    file2 = bucket.blob("cloud_run_result.txt")
     file2.upload_from_string(str(similarity))
 
     return "function result:" + str(similarity) +  " with time: " + str(end-start)
