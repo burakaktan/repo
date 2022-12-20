@@ -21,6 +21,7 @@ from flask import Flask, request
 from collections import Counter
 import re
 from math import sqrt
+from google.cloud import storage
 
 from utils.logging import logger
 
