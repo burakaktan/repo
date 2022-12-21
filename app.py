@@ -40,16 +40,13 @@ def hello() -> str:
     try:
         text1 = str(request.args.get('text1'))
         text2 = str(request.args.get('text2'))
+        user_uuid = str(request.args.get('uuid'))
     except Exception as e:
         return e.message + + "text1= " + str(text1)
     
     similarity = compute_similarity(text1, text2)
     end = time.time()
     time_result = end-start
-
-        # Get the request parameters
-    string1 = request.args.get('text1')
-    string2 = request.args.get('text2')
     
     # Create a client for interacting with Google Cloud Storage
     storage_client = storage.Client()
@@ -58,11 +55,11 @@ def hello() -> str:
     bucket = storage_client.bucket("storage_time_and_result")
     
     # Write string1 to a file called "file1.txt"
-    file1 = bucket.blob("cloud_run_time.txt")
+    file1 = bucket.blob("cloud_run_time_" + user_uuid + ".txt")
     file1.upload_from_string(str(time_result))
     
     # Write string2 to a file called "file2.txt"
-    file2 = bucket.blob("cloud_run_result.txt")
+    file2 = bucket.blob("cloud_run_result_" + user_uuid + ".txt")
     file2.upload_from_string(str(similarity))
 
     return "function result:" + str(similarity) +  " with time: " + str(end-start)
